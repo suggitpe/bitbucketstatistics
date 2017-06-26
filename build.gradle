@@ -1,0 +1,40 @@
+defaultTasks 'clean', 'build'
+
+buildscript{
+    repositories{
+        jcenter()
+        mavenCentral()
+    }
+    dependencies{
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+jar{
+    baseName = 'simple-java-service'
+    version = '0.0.1'
+}
+
+repositories{
+    jcenter()
+    mavenCentral()
+}
+
+ext {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+dependencies{
+    compile 'org.springframework.boot:spring-boot-starter-web',
+            'org.springframework.cloud:spring-cloud-starter-eureka-server:1.0.6.RELEASE'
+    testCompile 'junit:junit'
+}
+
+task wrapper(type: Wrapper){
+    gradleVersion = '2.10'
+}
