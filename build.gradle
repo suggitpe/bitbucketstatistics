@@ -1,11 +1,11 @@
 defaultTasks 'clean', 'build'
 
-buildscript{
-    repositories{
+buildscript {
+    repositories {
         jcenter()
         mavenCentral()
     }
-    dependencies{
+    dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE")
     }
 }
@@ -14,12 +14,12 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 
-jar{
+jar {
     baseName = 'bitbucketstats'
     version = '0.0.1'
 }
 
-repositories{
+repositories {
     jcenter()
     mavenCentral()
 }
@@ -29,7 +29,11 @@ ext {
     targetCompatibility = 1.8
 }
 
-dependencies{
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    testCompile 'junit:junit'
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web',
+            'com.google.http-client:google-http-client:1.22.0',
+            'com.google.http-client:google-http-client-jackson2:1.22.0',
+            'com.google.guava:guava:19.0'
+    testCompile 'junit:junit',
+            'org.assertj:assertj-core:3.8.0'
 }
