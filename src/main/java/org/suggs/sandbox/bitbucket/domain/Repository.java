@@ -1,4 +1,4 @@
-package org.suggs.sandbox.bitbucket;
+package org.suggs.sandbox.bitbucket.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -7,7 +7,7 @@ public class Repository {
 
     private String scm;
     private String name;
-    private String commits;
+    private Links links;
 
     public String getScm() {
         return scm;
@@ -25,12 +25,12 @@ public class Repository {
         this.name = name;
     }
 
-    public String getCommits() {
-        return commits;
+    public Links getLinks() {
+        return links;
     }
 
-    public void setCommits(String commits) {
-        this.commits = commits;
+    public void setLinks(Links links) {
+        this.links = links;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class Repository {
         return "Repository{" +
                 "scm='" + scm + '\'' +
                 ", name='" + name + '\'' +
-                ", commits='" + commits + '\'' +
+                ", links=" + links +
                 '}';
     }
 }

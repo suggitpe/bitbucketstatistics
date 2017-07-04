@@ -1,18 +1,36 @@
-package org.suggs.sandbox.bitbucket;
+package org.suggs.sandbox.bitbucket.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RepositoryResponse {
+public class RepositoriesResponse {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RepositoriesResponse.class);
     private int pagelen;
     private int page;
     private int size;
     @JsonProperty("values")
     private List<Repository> repositories;
+
+    public List<URI> extractCommitsUri() {
+        List<URI> commitUris = new ArrayList<>();
+        for (Repository repo : getRepositories()) {
+            try {
+                commitUris.add(new URI(repo.getLinks().getCommits().getHref()));
+            } catch (URISyntaxException exception) {
+                LOG.error("Commits URI has syntax errors [" + repo.getLinks().getCommits().getHref() + "]");
+            }
+        }
+        return commitUris;
+    }
 
     public int getPagelen() {
         return pagelen;
@@ -34,10 +52,10 @@ public class RepositoryResponse {
         return size;
     }
 
+
     public void setSize(int size) {
         this.size = size;
     }
-
 
     public List<Repository> getRepositories() {
         return repositories;
@@ -49,7 +67,7 @@ public class RepositoryResponse {
 
     @Override
     public String toString() {
-        return "RepositoryResponse{" +
+        return "RepositoriesResponse{" +
                 "pagelen=" + pagelen +
                 ", page=" + page +
                 ", size=" + size +
