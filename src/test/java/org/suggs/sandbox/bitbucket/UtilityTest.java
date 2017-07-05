@@ -8,7 +8,6 @@ import org.suggs.sandbox.bitbucket.domain.RepositoriesResponse;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,8 +54,8 @@ public class UtilityTest {
 
     @Test
     public void countsCommitsByAuthorFromRepositoryUri() throws Exception {
-        Map<String, Integer> mapOfCommits = utility.retrieveMapOfCommitsByAuthorFrom(REPOSITORIES_URI);
-        LOG.debug(""+ mapOfCommits.toString());
+        Map<AuthorDate, Integer> mapOfCommits = utility.retrieveMapOfCommitsByAuthorFrom(REPOSITORIES_URI);
+        LOG.debug("" + mapOfCommits.toString());
         assertThat(mapOfCommits.keySet().size()).isNotZero();
     }
 

@@ -10,6 +10,8 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Charsets;
 import com.google.common.io.CharStreams;
+import org.apache.http.client.utils.DateUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suggs.sandbox.bitbucket.domain.Commit;
@@ -20,24 +22,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Utility {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utility.class);
 
-    public Map<String, Integer> retrieveMapOfCommitsByAuthorFrom(URI repositoriesURI) throws IOException {
+    public Map<AuthorDate, Integer> retrieveMapOfCommitsByAuthorFrom(URI repositoriesURI) throws IOException {
         List<Commit> commits = retieveListOfCommitsForRepositoriesAtUri(repositoriesURI);
-        Map<String, Integer> commitsByAuthorMap = new HashMap<>();
+        Map<AuthorDate, Integer> commitsByAuthorMap = new HashMap<>();
         for (Commit commit : commits) {
-            String key = commit.getAuthor().getUser().getUsername();
+            AuthorDate key = new AuthorDate(commit.getAuthor().getUser().getUsername(), new DateTime(commit.getDate()).monthOfYear().roundFloorCopy());
             if (commitsByAuthorMap.containsKey(key)) {
                 commitsByAuthorMap.put(key, commitsByAuthorMap.get(key) + 1);
             } else {
-                commitsByAuthorMap.put(commit.getAuthor().getUser().getUsername(), 1);
+                commitsByAuthorMap.put(key, 1);
             }
         }
         return commitsByAuthorMap;
@@ -54,7 +53,7 @@ public class Utility {
     public List<Commit> retieveListOfCommitsForRepositoriesAtUri(URI repositoriesUri) throws IOException {
         RepositoriesResponse repositories = retrieveListOfRepositoriesForUri(repositoriesUri);
         LOG.debug("Extracting commits from " + repositories.getSize() + " repositories");
-        List<URI> commitUris = repositories.extractCommitsUri();
+        List<URI> commitUris = repositories.extractCommitsUris();
         List<Commit> commits = new ArrayList<>();
         for (URI commitUri : commitUris) {
             CommitResponse commitResponse = createCommitResponseFrom(retrieveJsonFrom(commitUri));

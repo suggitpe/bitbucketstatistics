@@ -33,7 +33,8 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web',
             'com.google.http-client:google-http-client:1.22.0',
             'com.google.http-client:google-http-client-jackson2:1.22.0',
-            'com.google.guava:guava:19.0'
+            'com.google.guava:guava:19.0',
+            'joda-time:joda-time:2.9.9'
     testCompile 'junit:junit',
             'org.assertj:assertj-core:3.8.0'
 }

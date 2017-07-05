@@ -20,7 +20,7 @@ public class RepositoriesResponse {
     @JsonProperty("values")
     private List<Repository> repositories;
 
-    public List<URI> extractCommitsUri() {
+    public List<URI> extractCommitsUris() {
         List<URI> commitUris = new ArrayList<>();
         for (Repository repo : getRepositories()) {
             try {
