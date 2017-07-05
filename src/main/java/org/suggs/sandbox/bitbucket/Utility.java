@@ -12,6 +12,7 @@ import com.google.api.client.util.Charsets;
 import com.google.common.io.CharStreams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.suggs.sandbox.bitbucket.domain.Commit;
 import org.suggs.sandbox.bitbucket.domain.CommitResponse;
 import org.suggs.sandbox.bitbucket.domain.RepositoriesResponse;
 
@@ -19,11 +20,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Utility {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utility.class);
+
+    public Map<String, Integer> retrieveMapOfCommitsByAuthorFrom(URI repositoriesURI) throws IOException {
+        List<Commit> commits = retieveListOfCommitsForRepositoriesAtUri(repositoriesURI);
+        Map<String, Integer> commitsByAuthorMap = new HashMap<>();
+        for (Commit commit : commits) {
+            String key = commit.getAuthor().getUser().getUsername();
+            if (commitsByAuthorMap.containsKey(key)) {
+                commitsByAuthorMap.put(key, commitsByAuthorMap.get(key) + 1);
+            } else {
+                commitsByAuthorMap.put(commit.getAuthor().getUser().getUsername(), 1);
+            }
+        }
+        return commitsByAuthorMap;
+    }
 
     public RepositoriesResponse retrieveListOfRepositoriesForUri(URI repositoriesURI) throws IOException {
         return createRepositoriesResponseFrom(retrieveJsonFrom(repositoriesURI));
@@ -33,16 +51,17 @@ public class Utility {
         return new ObjectMapper().readValue(json, RepositoriesResponse.class);
     }
 
-    public List<URI> retieveListOfCommitsForRepositoriesAtUri(URI repositoriesUri) throws IOException {
+    public List<Commit> retieveListOfCommitsForRepositoriesAtUri(URI repositoriesUri) throws IOException {
         RepositoriesResponse repositories = retrieveListOfRepositoriesForUri(repositoriesUri);
-        LOG.debug("Extracting commits from "+ repositories.getSize()+" repositories");
+        LOG.debug("Extracting commits from " + repositories.getSize() + " repositories");
         List<URI> commitUris = repositories.extractCommitsUri();
+        List<Commit> commits = new ArrayList<>();
         for (URI commitUri : commitUris) {
-            LOG.debug("Extracting commits from [" + commitUri + "]");
             CommitResponse commitResponse = createCommitResponseFrom(retrieveJsonFrom(commitUri));
-            LOG.debug("" + commitResponse);
+            LOG.debug(commitResponse.toString());
+            commits.addAll(commitResponse.getCommits());
         }
-        return commitUris;
+        return commits;
     }
 
     private CommitResponse createCommitResponseFrom(String json) throws IOException {
@@ -54,7 +73,7 @@ public class Utility {
         HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(aUri));
         HttpResponse response = request.execute();
         String json = stringifyStream(response.getContent());
-        LOG.debug(json);
+//        LOG.debug(json);json
         return json;
     }
 

@@ -2,10 +2,13 @@ package org.suggs.sandbox.bitbucket.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Date;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Commit {
     private String hash;
     private Author author;
+    private Date date;
 
     public String getHash() {
         return hash;
@@ -23,11 +26,20 @@ public class Commit {
         this.author = author;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
         return "Commit{" +
                 "hash='" + hash + '\'' +
                 ", author=" + author +
+                ", date=" + date +
                 '}';
     }
 }
