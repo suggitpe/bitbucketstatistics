@@ -42,14 +42,6 @@ public class Utility {
         return commitsByAuthorMap;
     }
 
-    public RepositoriesResponse retrieveListOfRepositoriesForUri(URI repositoriesURI) throws IOException {
-        return createRepositoriesResponseFrom(retrieveJsonFrom(repositoriesURI));
-    }
-
-    protected RepositoriesResponse createRepositoriesResponseFrom(String json) throws IOException {
-        return new ObjectMapper().readValue(json, RepositoriesResponse.class);
-    }
-
     public List<Commit> retieveListOfCommitsForRepositoriesAtUri(URI repositoriesUri) throws IOException {
         RepositoriesResponse repositories = retrieveListOfRepositoriesForUri(repositoriesUri);
         LOG.debug("Extracting commits from " + repositories.getSize() + " repositories");
@@ -63,6 +55,14 @@ public class Utility {
         return commits;
     }
 
+    public RepositoriesResponse retrieveListOfRepositoriesForUri(URI repositoriesURI) throws IOException {
+        return createRepositoriesResponseFrom(retrieveJsonFrom(repositoriesURI));
+    }
+
+    protected RepositoriesResponse createRepositoriesResponseFrom(String json) throws IOException {
+        return new ObjectMapper().readValue(json, RepositoriesResponse.class);
+    }
+
     private CommitResponse createCommitResponseFrom(String json) throws IOException {
         return new ObjectMapper().readValue(json, CommitResponse.class);
     }
@@ -72,7 +72,7 @@ public class Utility {
         HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(aUri));
         HttpResponse response = request.execute();
         String json = stringifyStream(response.getContent());
-//        LOG.debug(json);json
+//        LOG.debug(json);
         return json;
     }
 
