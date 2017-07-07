@@ -10,7 +10,6 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Charsets;
 import com.google.common.io.CharStreams;
-import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Utility {
 
@@ -72,8 +74,17 @@ public class Utility {
         HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(aUri));
         HttpResponse response = request.execute();
         String json = stringifyStream(response.getContent());
-//        LOG.debug(json);
+        LOG.debug(json);
         return json;
+    }
+
+    private HttpRequestFactory createNewHttpRequestFactory() {
+        ClientAuthentication auth = new ClientAuthentication();
+        LOG.debug("Accessing repositories with user [" + auth.getUsername() + "]");
+        return new NetHttpTransport().createRequestFactory(request -> {
+            request.getHeaders().setBasicAuthentication(auth.getUsername(), auth.getPassword());
+            request.setParser(new JsonObjectParser(new JacksonFactory()));
+        });
     }
 
     private String stringifyStream(InputStream is) {
@@ -83,9 +94,5 @@ public class Utility {
             LOG.error("Failed to stringify JSON", ioexception);
         }
         return null;
-    }
-
-    private HttpRequestFactory createNewHttpRequestFactory() {
-        return new NetHttpTransport().createRequestFactory(request -> request.setParser(new JsonObjectParser(new JacksonFactory())));
     }
 }
