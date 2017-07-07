@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Utility {
+public class BitbucketStatisticsClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Utility.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BitbucketStatisticsClient.class);
 
     public Map<AuthorDate, Integer> retrieveMapOfCommitsByAuthorFrom(URI repositoriesURI) throws IOException {
         List<Commit> commits = retieveListOfCommitsForRepositoriesAtUri(repositoriesURI);
@@ -51,7 +51,7 @@ public class Utility {
         List<Commit> commits = new ArrayList<>();
         for (URI commitUri : commitUris) {
             CommitResponse commitResponse = createCommitResponseFrom(retrieveJsonFrom(commitUri));
-            LOG.debug(commitResponse.toString());
+//            LOG.debug(commitResponse.toString());
             commits.addAll(commitResponse.getCommits());
         }
         return commits;
@@ -74,7 +74,7 @@ public class Utility {
         HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(aUri));
         HttpResponse response = request.execute();
         String json = stringifyStream(response.getContent());
-        LOG.debug(json);
+//        LOG.debug(json);
         return json;
     }
 
