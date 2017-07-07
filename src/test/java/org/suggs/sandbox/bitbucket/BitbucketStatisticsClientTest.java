@@ -19,6 +19,7 @@ public class BitbucketStatisticsClientTest {
     private static URI REPOSITORIES_URI;
 
     private BitbucketStatisticsClient bitbucketStatisticsClient;
+    private static final ClientAuthentication CLIENT_AUTH = new EnvironmentClientAuthentication();
 
     static {
         try {
@@ -35,14 +36,14 @@ public class BitbucketStatisticsClientTest {
 
     @Test
     public void retrievesListOfRepositoriesFromURI() throws Exception {
-        RepositoriesResponse repos = bitbucketStatisticsClient.retrieveListOfRepositoriesForUri(REPOSITORIES_URI);
+        RepositoriesResponse repos = bitbucketStatisticsClient.retrieveListOfRepositoriesForUri(REPOSITORIES_URI, CLIENT_AUTH);
         LOG.debug(repos.toString());
         assertThat(repos.getRepositories()).isNotEmpty();
     }
 
     @Test
     public void retievesListOfCommitsFromRepositoryURI() throws Exception {
-        bitbucketStatisticsClient.retieveListOfCommitsForRepositoriesAtUri(REPOSITORIES_URI);
+        bitbucketStatisticsClient.retieveListOfCommitsForRepositoriesAtUri(REPOSITORIES_URI, CLIENT_AUTH);
     }
 
     @Test
@@ -54,7 +55,7 @@ public class BitbucketStatisticsClientTest {
 
     @Test
     public void countsCommitsByAuthorFromRepositoryUri() throws Exception {
-        Map<AuthorDate, Integer> mapOfCommits = bitbucketStatisticsClient.retrieveMapOfCommitsByAuthorFrom(REPOSITORIES_URI);
+        Map<AuthorDate, Integer> mapOfCommits = bitbucketStatisticsClient.retrieveMapOfCommitsByAuthorFrom(REPOSITORIES_URI, CLIENT_AUTH);
         LOG.debug("" + mapOfCommits.toString());
         assertThat(mapOfCommits.keySet().size()).isNotZero();
     }

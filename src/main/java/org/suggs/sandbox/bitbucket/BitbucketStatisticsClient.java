@@ -30,8 +30,8 @@ public class BitbucketStatisticsClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(BitbucketStatisticsClient.class);
 
-    public Map<AuthorDate, Integer> retrieveMapOfCommitsByAuthorFrom(URI repositoriesURI) throws IOException {
-        List<Commit> commits = retieveListOfCommitsForRepositoriesAtUri(repositoriesURI);
+    public Map<AuthorDate, Integer> retrieveMapOfCommitsByAuthorFrom(URI repositoriesURI, ClientAuthentication auth) throws IOException {
+        List<Commit> commits = retieveListOfCommitsForRepositoriesAtUri(repositoriesURI, auth);
         Map<AuthorDate, Integer> commitsByAuthorMap = new HashMap<>();
         for (Commit commit : commits) {
             AuthorDate key = new AuthorDate(commit.getAuthor().getUser().getUsername(), new DateTime(commit.getDate()).monthOfYear().roundFloorCopy());
@@ -44,21 +44,21 @@ public class BitbucketStatisticsClient {
         return commitsByAuthorMap;
     }
 
-    public List<Commit> retieveListOfCommitsForRepositoriesAtUri(URI repositoriesUri) throws IOException {
-        RepositoriesResponse repositories = retrieveListOfRepositoriesForUri(repositoriesUri);
+    public List<Commit> retieveListOfCommitsForRepositoriesAtUri(URI repositoriesUri, ClientAuthentication auth) throws IOException {
+        RepositoriesResponse repositories = retrieveListOfRepositoriesForUri(repositoriesUri, auth);
         LOG.debug("Extracting commits from " + repositories.getSize() + " repositories");
         List<URI> commitUris = repositories.extractCommitsUris();
         List<Commit> commits = new ArrayList<>();
         for (URI commitUri : commitUris) {
-            CommitResponse commitResponse = createCommitResponseFrom(retrieveJsonFrom(commitUri));
+            CommitResponse commitResponse = createCommitResponseFrom(retrieveJsonFrom(commitUri, auth));
 //            LOG.debug(commitResponse.toString());
             commits.addAll(commitResponse.getCommits());
         }
         return commits;
     }
 
-    public RepositoriesResponse retrieveListOfRepositoriesForUri(URI repositoriesURI) throws IOException {
-        return createRepositoriesResponseFrom(retrieveJsonFrom(repositoriesURI));
+    public RepositoriesResponse retrieveListOfRepositoriesForUri(URI repositoriesURI, ClientAuthentication auth) throws IOException {
+        return createRepositoriesResponseFrom(retrieveJsonFrom(repositoriesURI, auth));
     }
 
     protected RepositoriesResponse createRepositoriesResponseFrom(String json) throws IOException {
@@ -69,8 +69,8 @@ public class BitbucketStatisticsClient {
         return new ObjectMapper().readValue(json, CommitResponse.class);
     }
 
-    private String retrieveJsonFrom(URI aUri) throws IOException {
-        HttpRequestFactory requestFactory = createNewHttpRequestFactory();
+    private String retrieveJsonFrom(URI aUri, ClientAuthentication auth) throws IOException {
+        HttpRequestFactory requestFactory = createNewHttpRequestFactory(auth);
         HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(aUri));
         HttpResponse response = request.execute();
         String json = stringifyStream(response.getContent());
@@ -78,8 +78,7 @@ public class BitbucketStatisticsClient {
         return json;
     }
 
-    private HttpRequestFactory createNewHttpRequestFactory() {
-        ClientAuthentication auth = new ClientAuthentication();
+    private HttpRequestFactory createNewHttpRequestFactory(ClientAuthentication auth) {
         LOG.debug("Accessing repositories with user [" + auth.getUsername() + "]");
         return new NetHttpTransport().createRequestFactory(request -> {
             request.getHeaders().setBasicAuthentication(auth.getUsername(), auth.getPassword());
